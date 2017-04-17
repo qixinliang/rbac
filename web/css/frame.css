@@ -1,0 +1,75 @@
+
+#menu-area{
+}
+
+#title-area{
+    margin-left:-16px;
+    margin-right:-16px;
+}
+
+#container-area{
+    min-height: 600px;
+}
+
+/*for all scrollbar of vertical*/
+.scroll-vertical {
+    overflow-x: hidden;
+    overflow-y: visible;
+    white-space: nowrap;
+    box-shadow:none;
+}
+
+/*menu view*/
+.menu-list-view {
+    padding: 4px 4px 4px 20px;
+    margin-right: 4px;
+    max-height: 450px;
+}
+
+@media ( min-height: 900px) {
+    .menu-list-view {
+        max-height: 530px;
+    }
+}
+
+/*menu view item*/
+.nav.menu-list-view > li > a {
+    padding: 2px 10px 2px 15px;
+    font-size: 100%;
+}
+
+span.menu-checked{
+    margin-left: -15px;
+    margin-right: 4px;
+    font-size: 75%;
+}
+
+/*title area*/
+.title-area-view {
+    min-height: 400px;
+    max-height: 600px;
+}
+
+/*view 2, inside in title area*/
+.title-area-view2 {
+    padding: 4px 4px 4px 20px;
+    margin: 0px 2px 0px 0px;
+    max-height: 500px;
+}
+
+span.inline-edit {
+    color: #e8e8e8;
+}
+
+span.inline-edit:hover {
+    color: #00FF00;
+}
+
+.span.inline-edit .active {
+    color: #00FF00;
+}
+
+input.inline-edit {
+    padding: 0px 4px;
+    margin: -8px;
+}

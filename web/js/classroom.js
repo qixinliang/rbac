@@ -150,6 +150,46 @@ function menu_init(ul) {
     var div = $('<ul class="nav nav-pills nav-stacked"></ul>');
     $(ul).append(div);
 
+	$.ajax({
+		url:'/school/list',
+		type:'get',
+		dataType:'json',
+		data:{api:'schoolList',user:_user},
+		success:function(result){
+        	function addLi(name, sid) {
+            	var li = $('<li><a href="#"><span class="glyphicon glyphicon-home"></span>'+name + '</a></li>');
+            	$(li).find('a').prop('param', sid).prop('fun', 'menu_school');
+            	$(div).append(li);
+        	}
+			//成功
+			if(result.code == '200'){
+            	var items = result.data;
+            	if ($(ul).css('overflow-y') == 'visible') {
+                	$(items).each(function (i, it) {
+                    	addLi(it.name, it.sid);
+                	});
+                	Frame.menuInitFinished();
+            	} else {
+                	Frame.Tools.createPageView(div, items, function (view, args, from, to) {
+                    	for (var i = from; i < to; i++) {
+                        	addLi(items[i].name, items[i].sid);
+                    	}
+                   		Frame.menuInitFinished();
+               		}, 10);
+            	}
+			}else{
+            	Frame.menuInitFinished();
+			}
+		}
+	});
+}
+
+/*
+function menu_init(ul) {
+
+    var div = $('<ul class="nav nav-pills nav-stacked"></ul>');
+    $(ul).append(div);
+
     $.getJSON("jsonApi.php", {
         api: "schoolList",
         user: _user
@@ -181,7 +221,7 @@ function menu_init(ul) {
             Frame.menuInitFinished();
         }
     });
-}
+}*/
 
 /**
  * all school
@@ -360,45 +400,38 @@ function classToolbar() {
  */
 function menu_school(sid, page) {
     Frame.titleShow(3);
-
-    $.getJSON("jsonApi.php", {
-        api: "getClasses",
-        sid: sid,
-        page: -1,//page - 1,
-        user: _user
-    }, function (result) {
-
-        var lis = [{
-            name: "校级管理中心",
-            fun: schoolAll,
-            param: sid
-        }];
-
-        if (result.error != "OK") {
-            Frame.titleInitialize(lis);
-        } else {
-            var items = result.value;
-
-            lis.push({
-                name: "---"
-            });
-
-
-            var toolbar = classToolbar();
-            lis.push({name: '---toolbar', param: toolbar});
-
-            for (var i = 0; i < items.length; i++) {
-                var s = '<div class="small row" cname="' + items[i].class_name + '">' +
+	$.ajax({
+        url:'/classroom/info',
+        type:'get',
+        dataType:'json',
+        data:{sid:sid,user:_user,page:-1},
+		success:function(result){
+        	var lis = [{
+            	name: "校级管理中心",
+            	fun: schoolAll,
+            	param: sid
+        	}];
+			if(result.code != '200'){
+            	Frame.titleInitialize(lis);
+			}else{
+				var items = result.value;
+            	lis.push({
+                	name: "---"
+            	});
+            	var toolbar = classToolbar();
+            	lis.push({name: '---toolbar', param: toolbar});
+            	for (var i = 0; i < items.length; i++) {
+                	var s = '<div class="small row" cname="' + items[i].class_name + '">' +
                     '<div class="col-sm-2">' + statusDiv(items[i].status, items[i].cid, sid) + '</div>' +
                     '<div class="col-sm-10">' +
 
                     '<div class="row class-list-title-view-1">' +
-                    '<div class="col-sm-8"><img class="img" src="icon/school-label.png"/>' + items[i].name + '</div>' +
+                    '<div class="col-sm-8"><img class="img" src="/icon/school-label.png"/>' + items[i].name + '</div>' +
                     '<div class="col-sm-4"><div class="pull-right disabled">' + items[i].class_name + '教室</div></div>' +
                     '</div>' +
 
                     '<div class="row class-list-title-view-2 class-list-title2">' +
-                    '<div class="col-sm-12"><img src="icon/model-label.png"/>' +
+                    '<div class="col-sm-12"><img src="/icon/model-label.png"/>' +
                     '<span class="uuid" cid="'+items[i].cid+'">' + items[i].uuid + '</span></div>' +
                     /*'<div class="col-sm-8"><div class="pull-right"><img src="icon/uuid-label.png"/>' +
                      items[i].uuid.substr(0, 16) + '</div></div>' +*/
@@ -418,39 +451,16 @@ function menu_school(sid, page) {
                 });
             }
 
-            /*
-             var pageind = result.value2;
-             pageind.fun = menu_school;
-             pageind.param = sid;
-             */
-
             var ul = Frame.titleInitialize(lis/*, pageind*/);
+        	var statusTimer = new StatusTimer(sid);
+        	statusTimer.start();
+        	Frame.titleUnload(function () {
+            	statusTimer.stop();
+        	});
 
-            /* remove inlineedit
-             if(acCheckAcl('device')) {
-             Frame.Tools.inlineEdit($(ul).find('span.inline-edit'), function (prev, t) {
-             $.getJSON('jsonApi.php', {
-             api: 'classNameUpdate',
-             cid: $(prev).attr('cid'),
-             text: t
-             }, function (r) {
-             if (r.error == 'OK') {
-             $(prev).text(t);
-             }
-             })
-             });
-             }else{
-             $(ul).find('span.inline-edit').remove();
-             }
-             */
-        }
-
-        var statusTimer = new StatusTimer(sid);
-        statusTimer.start();
-        Frame.titleUnload(function () {
-            statusTimer.stop();
-        });
-    });
+			}
+		}
+	});
 }
 
 function schoolMap(param, qobj) {

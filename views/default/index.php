@@ -69,7 +69,8 @@ use yii\helpers\Url;
 var _user="admin";
 var _user_flag="school";
 var _acl=65535;
-</script>        <li><a id="menu_schools" href="#">
+</script>        
+			<li><a id="menu_schools" href="#">
             <span class="glyphicon glyphicon-th"></span>区管理中心-蔡甸区
             <span class="badge"></span></a></li>
 

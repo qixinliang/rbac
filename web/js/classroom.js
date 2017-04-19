@@ -533,6 +533,7 @@ function schoolMap(param, qobj) {
     }
 }
 
+//具体学校的map展示
 function schoolMapIt(sid, qobj) {
 
     if ($(qobj).html() == "") {
@@ -540,6 +541,24 @@ function schoolMapIt(sid, qobj) {
         var div = Frame.Tools.createNode("div", "school-map-tab", null, "school-it-" + sid);
         $(qobj).append(div);
 
+		$.ajax({
+			url: '/school/info',
+			type: 'get',
+			dataType: 'json',
+			data:{sid: sid},
+			success: function(r){
+            	if (r.error == "OK") {
+                	var map = new Frame.GaoDeMap();
+                	map.createById("school-it-" + sid);
+
+                	map.addMarker([{
+                    	longitude: r.value.longitude,
+                    	latitude: r.value.latitude
+                	}], true, true);
+            	}
+			}
+		});
+		/*
         $.getJSON("jsonApi.php", {
             api: "schoolIt",
             sid: sid
@@ -553,7 +572,7 @@ function schoolMapIt(sid, qobj) {
                     latitude: r.value.latitude
                 }], true, true);
             }
-        });
+        });*/
 
     }
 }
@@ -669,7 +688,7 @@ function schoolForm(qobj, edit_result) {
 		url: '/level/list',
 		type: 'get',
 		dataType: 'json',
-		data: '',
+		data: {},
 		success: function(level){
         	var map = null;
         	var lng, lat, prov, city, dist, street;
@@ -760,30 +779,51 @@ function schoolForm(qobj, edit_result) {
             	}
 
             	si.wait();
-            	$.getJSON("jsonApi.php", {
-                	api: "schoolAdd",
-                	name: sname,
-                	lid: level_val,
-                	lng: lng,
-                	lat: lat,
-                	prov: prov,
-                	city: city,
-                	dist: dist,
-                	street: street,
-                	sid: (edit_result ? edit_result.sid : null),
-                	group: true
-            	}, function (r) {
-                	if (r == undefined || r.error != "OK") {
-                    	si.failed();
-                	} else {
-                    	si.ok();
-                    	if (!edit_result) {
-                        	$(name_div).find("input").val("");
-                        	Frame.menuAddItem('glyphicon glyphicon-unchecked', sname, 'menu_school', r.value);
+				$.ajax({
+					url: '/school/add',
+					type: 'post',
+					dataType: 'json',
+					data: {name:sname,lid:level_val,lng:lng,lat:lat,prov:prov,city:city,dist:dist,street:street,sid:(edit_result? edit_result.sid:null),group:true},
+					success: function(r){
+                		if (r == undefined || r.error != "OK") {
+                    		si.failed();
+                		} else {
+                    		si.ok();
+                    		if (!edit_result) {
+                        		$(name_div).find("input").val("");
+                        		Frame.menuAddItem('glyphicon glyphicon-unchecked', sname, 'menu_school', r.value);
                     	}
-                	}
-            	})
+                		}
+					}
+				});
         	});
+
+        // call after mount this node
+        map = new Frame.GaoDeMap();
+        map.createById(idMap);
+
+        window.navigator.geolocation.getCurrentPosition(function (position) {
+            var lng = position.coords.longitude;
+            var lat = position.coords.latitude;
+
+            map.locationByLngLat(lng,lat);
+        });
+
+        var old = null;
+        if (edit_result) {
+            lng = edit_result.longitude;
+            lat = edit_result.latitude;
+            old = [lng, lat];
+        }
+
+        $(addr_div).find('input').keypress(function(event){
+            if(event.keyCode==0x0d){
+                var s=$(this).val();
+                if(s){
+                    $(this).focusout();
+                }
+            }
+        });
 
         	$(addr_div).find('input').change(function () {
             	var s = $(this).val();

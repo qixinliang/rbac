@@ -53,6 +53,33 @@ function StatusTimer(sid2) {
 
     this.timerProc = function () {
         var cid = $('input.SWITCH[name="dev-control"]').attr('cid');
+		$.ajax({
+			url:'/classroom/status',
+        	type:'get',
+        	dataType:'json',
+        	data:{sid:sid},
+			success:function(r){
+            	if (r.error == "OK") {
+                	var status = null;
+                	$(r.value).each(function (i, it) {
+                    	$('div.STATUS[cid="' + it.cid + '"]').empty()
+                        	.append(it.uuid?statusContent(it.status):'(无)')
+                        	.removeClass('status-active status-standby status-offline')
+                        	.addClass('status-' + it.status);
+
+                    	$('span.uuid[cid="'+it.cid+'"]').text(it.uuid);
+
+                    	if (cid == it.cid) {
+                        	status = it.status;
+                        	controlForm(cid, status);
+                    	}
+                	});
+
+                	dnameForm(cid, status, r.value2);
+            	}
+			}
+		});
+		/*
         $.get("jsonApi.php", {
             api: "classStatusBySid",
             sid: sid,
@@ -76,7 +103,7 @@ function StatusTimer(sid2) {
 
                 dnameForm(cid, status, r.value2);
             }
-        });
+        });*/
     };
 
     function controlForm(cid, status) {
@@ -474,6 +501,7 @@ function schoolMap(param, qobj) {
         var mapSchool = new Frame.GaoDeMap();
         mapSchool.createById(id);
 
+		/*
         $.getJSON("jsonApi.php", {
             api: "schoolList",
             user: _user
@@ -486,7 +514,22 @@ function schoolMap(param, qobj) {
                     mapSchool.addMarker(result.value, true, true);
                 }
             }
-        });
+        });*/
+		$.ajax({
+			url:'/school/list',
+			type:'get',
+			dataType:'json',
+			data:{api:'schoolList',user:_user},
+			success:function(result){
+				if(result.code != '200'){
+
+				}else{
+					if(result.data.length > 0){
+                    	mapSchool.addMarker(result.data, true, true);
+					}
+				}
+			}
+		});
     }
 }
 
@@ -620,6 +663,196 @@ function schoolAdd(param, qobj) {
     }
 }
 
+//xl
+function schoolForm(qobj, edit_result) {
+	$.ajax({
+		url: '/level/list',
+		type: 'get',
+		dataType: 'json',
+		data: '',
+		success: function(level){
+        	var map = null;
+        	var lng, lat, prov, city, dist, street;
+
+        	var div = Frame.Tools.createNode("div", 'margin-2');
+        	$(qobj).append(div);
+
+        	var row = Frame.Tools.createNode("div", "row");
+        	$(div).append(row);
+
+        	var b1 = Frame.Tools.createNode("div", "col-sm-5");
+        	$(row).append(b1);
+
+        	var b2 = Frame.Tools.createNode("div", "col-sm-7");
+        	$(row).append(b2);
+
+        	var g = Frame.Tools.createNode("div", "form-group");
+        	var idMap = edit_result ? "school-map-edit" : "school-map-add";
+
+        	var map_root = Frame.Tools.createNode("div", idMap + ' shadow', null, idMap);
+        	$(g).append(map_root);
+        	$(b2).append(g);
+
+        	// B1
+        	var b3 = Frame.Tools.createNode("div", "padding-1");
+        	$(b1).append(b3);
+
+        	var name_div = Frame.Tools.createInputWithLabel("text", "学校名称", "4-16个字符以内");
+        	$(b3).append(name_div);
+        	if (edit_result) {
+            	$(name_div).find("input").val(edit_result.name);
+        	}
+
+        	$(b3).append("<br/>");
+        	var level_val = 3;// zhongxue
+        	if (edit_result) {
+            	level_val = edit_result.lid;
+        	}
+        	var lt = level.value[level_val].name;
+
+        	var level_div = Frame.Tools.createDropDown(level.value, lt, function (v) {
+            	level_val = v;
+            	Frame.Tools.activeButton(button, true);
+        	}, {label:"学校类型"});
+        	$(b3).append(level_div);
+
+        	var s = edit_result ?(edit_result.province + edit_result.city + edit_result.dist + edit_result.street) : null;
+        	var addr_div = Frame.Tools.createInputWithLabel('text', '地址',
+            	'(输入地址，或拖动地图标识)', s);
+        	$(b3).append("<br/>").append(addr_div);
+
+        	var button = Frame.Tools.createNodeWithGlyph("glyphicon glyphicon-ok", "button",
+            "btn btn-default my-button my-button-right", edit_result ? "修改" : "增加");
+        	Frame.Tools.activeButton(button, false);
+
+        	$(b3).append("<hr/>").append(button);
+
+        	$(name_div).find("input").change(function () {
+            	Frame.Tools.activeButton(button, true);
+        	});
+
+        	$(button).click(function () {
+
+            	var si = new Frame.ButtonInfo(this);
+            	if (si.isDisabled()) {
+                	return;
+            	}
+
+            	if (level_val == -1) {
+                	si.validFailed("学校类型没有选择", level_div);
+            	} else {
+                	si.validOk(level_div);
+            	}
+
+            	var sname = $(name_div).find("input").val();
+            	if (sname == "" || sname.length > 16) {
+                	si.validFailed("学校名称大于16个字符", name_div);
+            	} else {
+                	si.validOk(name_div);
+            	}
+
+            	if (!lng || !lat || (!edit_result && (!prov || !city || !dist || !street))) {
+                	si.validFailed("地址必须指定省市区街道");
+            	}
+
+            	if (si.count() > 0) {
+                	return;
+            	}
+
+            	si.wait();
+            	$.getJSON("jsonApi.php", {
+                	api: "schoolAdd",
+                	name: sname,
+                	lid: level_val,
+                	lng: lng,
+                	lat: lat,
+                	prov: prov,
+                	city: city,
+                	dist: dist,
+                	street: street,
+                	sid: (edit_result ? edit_result.sid : null),
+                	group: true
+            	}, function (r) {
+                	if (r == undefined || r.error != "OK") {
+                    	si.failed();
+                	} else {
+                    	si.ok();
+                    	if (!edit_result) {
+                        	$(name_div).find("input").val("");
+                        	Frame.menuAddItem('glyphicon glyphicon-unchecked', sname, 'menu_school', r.value);
+                    	}
+                	}
+            	})
+        	});
+
+        	$(addr_div).find('input').change(function () {
+            	var s = $(this).val();
+
+            	if (!s) {
+                	return;
+            	}
+
+            	var index = s.indexOf('省');
+            	if (index == -1) {
+                	prov = '湖北省';
+            	} else {
+                	prov = s.substr(0, index);
+                	s=s.substr(index+1);
+            	}
+
+
+            	index = s.indexOf('市');
+            	if (index == -1) {
+                	city = '武汉市';
+            	} else {
+                	city = s.substr(0, index);
+                	s=s.substr(index+1);
+            	}
+
+
+            	index = s.indexOf('区');
+            	if (index == -1) {
+                	dist = '蔡甸区';
+            	} else {
+                	dist = s.substr(0, index);
+                	s=s.substr(index+1);
+            	}
+
+            	street = s;
+            	if(street) {
+
+                	$(this).prop('no-change', true);
+
+                	map.locationAddress(prov+city+dist+street, true, function (lnglat) {
+                    	lng = lnglat.getLng();
+                    	lat = lnglat.getLat();
+                	});
+
+                	return;
+            	}
+
+            	map.locationAddress(s, true);
+        	});
+
+        	map.edit(old, 15, function addressSave(x, y, p, c, d, s) {
+            	lng = x;
+            	lat = y;
+            	prov = p;
+            	city = c;
+            	dist = d;
+            	street = s;
+            	if ($(addr_div).find('input').prop('no-change')) {
+                	$(addr_div).find('input').prop('no-change', false);
+            	} else {
+                	$(addr_div).find('input').val(p + c + d + s);
+            	}
+
+            	Frame.Tools.activeButton(button, true);
+        	});
+		}
+	});
+}
+/*
 function schoolForm(qobj, edit_result) {
 
     $.getJSON("jsonApi.php", {
@@ -838,7 +1071,7 @@ function schoolForm(qobj, edit_result) {
             Frame.Tools.activeButton(button, true);
         });
     });
-}
+}*/
 
 function versionConfig(dummy1, qobj) {
     if ($(qobj).html() == '') {

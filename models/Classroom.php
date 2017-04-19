@@ -12,4 +12,10 @@ class Classroom extends \yii\db\ActiveRecord{
 		$ret = self::find()->where(['sid' => $sid])->asArray()->all();
 		return $ret;
 	}
+	
+	public function getRoomStatusBySid($sid){
+		$sql = "SELECT `cid`,`status`,`uuid` FROM classroom WHERE `sid` = :sid";
+		$ret = self::findBySql($sql,[':sid'=>$sid])->asArray()->all();
+		return $ret;
+	}
 }

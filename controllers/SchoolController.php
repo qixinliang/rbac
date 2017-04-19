@@ -24,4 +24,16 @@ class SchoolController extends Controller{
 			));
 		}
 	}
+
+	//添加学校
+	public function actionAdd(){
+		$sModel = new School();
+		$request = Yii::$app->request;				
+		if($request->isPost){
+			if($sModel->load($request->post()) && $this->sModel->save()){
+				return json_encode();
+			}
+		}
+		return json_encode();
+	}
 }

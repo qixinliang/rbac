@@ -25,4 +25,22 @@ class ClassroomController extends Controller{
 			));
 		}
 	}
+
+	public function actionStatus(){
+		$request = Yii::$app->request;
+		$sid = $request->get('sid',1);
+		$cModel = new Classroom();
+		$ret = $cModel->getRoomStatusBySid($sid);
+		if(!isset($ret) || empty($ret)){
+			return json_encode(array(
+				'error' => 'error',
+				'value' => '',
+			));
+		}else{
+			return json_encode(array(
+				'error' => 'OK',
+				'value' => $ret,
+			));
+		}
+	}
 }

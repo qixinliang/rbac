@@ -447,7 +447,7 @@ function groupAdd(param, qobj) {
 function fmsView(url, autoplay) {
 
     if (!url) {
-        return $('<div class="fms-view text-center"><img src="icon/movie.png" class="fms-view"/></div>');
+        return $('<div class="fms-view text-center"><img src="/icon/movie.png" class="fms-view"/></div>');
     }
 
     var mime = 'video/mp4';

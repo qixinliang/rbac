@@ -28,12 +28,11 @@ use yii\helpers\Url;
 <link rel="stylesheet" href="/css/frame.css" />
 <link rel="stylesheet" href="/css/video-js.css">
 
-<script src="http://webapi.amap.com/maps?v=1.3&key=7d0d504f04355d38c302b6904745e823"></script>    
 <script>
 	window.HELP_IMPROVE_VIDEOJS = false;
 </script>
 <script src="/js/video.js"></script>
-<script src="/js/classroom.js"></script>
+<script src="/js/broadcast.js"></script>
 <script src="/js/frame.js"></script>
 <script src="/js/group.js"></script>
 
@@ -54,14 +53,14 @@ use yii\helpers\Url;
 			</div -->
 			<ul class="nav navbar-nav">
 		
+			<li>
+				<a href="<?php echo Url::toRoute('/default/index'); ?>"><span class="glyphicon glyphicon-th"></span>教室管控</a>
+			</li>
 			<li class="active">
-				<a><span class="glyphicon glyphicon-th"></span>教室管控</a>
+				<a><span class="glyphicon glyphicon-volume-up"></span>媒体与广播</a>
 			</li>
 			<li>
-				<a href="<?php echo Url::toRoute('/broadcast/index');?>"><span class="glyphicon glyphicon-volume-up"></span>媒体与广播</a>
-			</li>
-			<li>
-				<a href="<?php echo Url::toRoute('/acl/index'); ?>"><span class="glyphicon glyphicon-user"></span>安全与权限</a>
+				<a href="<?php echo Url::toRoute('/acl/index')?>"><span class="glyphicon glyphicon-user"></span>安全与权限</a>
 			</li>
 			</ul>
 			<ul class="nav navbar-nav pull-right">
@@ -78,12 +77,21 @@ use yii\helpers\Url;
 var _user="admin";
 var _user_flag="school";
 var _acl=65535;
-</script>        
-			<li><a id="menu_schools" href="#">
-            <span class="glyphicon glyphicon-th"></span>区管理中心-蔡甸区
-            <span class="badge"></span></a></li>
-
-        					</ul>
+</script>         
+		<li><a id="menu_media" href="#">
+            <span class="glyphicon glyphicon-film"></span>媒资管理中心</a></li>
+        
+        <li><a id="menu_group" href="#">
+            <span class="glyphicon glyphicon-list-alt"></span>分区分组</a></li>
+                         
+        <li><a id="menu_video_session" href="#">
+            <span class="glyphicon glyphicon-facetime-video"></span>视频互动</a></li>
+                
+         <li><a id="menu_broadcast_task" href="#">
+            <span class="glyphicon glyphicon-play"></span>视频广播</a></li>
+            
+         <li><a id="menu_ring" href="#">
+            <span class="glyphicon glyphicon-bell"></span>打铃</a></li>					</ul>
 					</nav>
 					<hr />
 					<div class="myclassroom-copyright">

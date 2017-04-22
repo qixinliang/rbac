@@ -12,12 +12,12 @@ class LevelController extends Controller{
         if(isset($ret) && !empty($ret)){
             return json_encode(array(
                 'error' => 'OK',
-                'level' => $ret
+                'value' => $ret
             ));
         }else{
             return json_encode(array(
 				'error' => 'Err',
-                'level' => ''
+                'value' => ''
             ));
         }
     }

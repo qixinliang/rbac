@@ -18,4 +18,11 @@ class Classroom extends \yii\db\ActiveRecord{
 		$ret = self::findBySql($sql,[':sid'=>$sid])->asArray()->all();
 		return $ret;
 	}
+
+	//添加教室
+	public function add($data){
+		//批量插入
+		return Yii::$app->db->createCommand()->batchInsert(
+			self::tableName(),['sid','name','class_name'],$data)->execute();
+	}
 }

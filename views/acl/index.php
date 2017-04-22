@@ -26,14 +26,11 @@ use yii\helpers\Url;
 
 <link rel="stylesheet" href="/css/myClassroom.css" />
 <link rel="stylesheet" href="/css/frame.css" />
-<link rel="stylesheet" href="/css/video-js.css">
 
-<script src="http://webapi.amap.com/maps?v=1.3&key=7d0d504f04355d38c302b6904745e823"></script>    
 <script>
 	window.HELP_IMPROVE_VIDEOJS = false;
 </script>
-<script src="/js/video.js"></script>
-<script src="/js/classroom.js"></script>
+<script src="/js/ac.js"></script>
 <script src="/js/frame.js"></script>
 <script src="/js/group.js"></script>
 
@@ -54,14 +51,14 @@ use yii\helpers\Url;
 			</div -->
 			<ul class="nav navbar-nav">
 		
+			<li>
+				<a href="<?php echo Url::toRoute('/default/index'); ?>"><span class="glyphicon glyphicon-th"></span>教室管控</a>
+			</li>
+			<li>
+				<a href="<?php echo Url::toRoute('/broadcast/index')?>"><span class="glyphicon glyphicon-volume-up"></span>媒体与广播</a>
+			</li>
 			<li class="active">
-				<a><span class="glyphicon glyphicon-th"></span>教室管控</a>
-			</li>
-			<li>
-				<a href="<?php echo Url::toRoute('/broadcast/index');?>"><span class="glyphicon glyphicon-volume-up"></span>媒体与广播</a>
-			</li>
-			<li>
-				<a href="<?php echo Url::toRoute('/acl/index'); ?>"><span class="glyphicon glyphicon-user"></span>安全与权限</a>
+				<a><span class="glyphicon glyphicon-user"></span>安全与权限</a>
 			</li>
 			</ul>
 			<ul class="nav navbar-nav pull-right">
@@ -78,12 +75,12 @@ use yii\helpers\Url;
 var _user="admin";
 var _user_flag="school";
 var _acl=65535;
-</script>        
-			<li><a id="menu_schools" href="#">
-            <span class="glyphicon glyphicon-th"></span>区管理中心-蔡甸区
-            <span class="badge"></span></a></li>
-
-        					</ul>
+</script>        <li><a id="menu_ac_me" href="#">
+            <span class="glyphicon glyphicon-user"></span>我的帐号
+            <span class="badge"></span></a></li>       
+       <li><a id="menu_ac_users" href="#">
+            <span class="glyphicon glyphicon-list-alt"></span>其他用户
+            <span class="badge"></span></a></li>					</ul>
 					</nav>
 					<hr />
 					<div class="myclassroom-copyright">

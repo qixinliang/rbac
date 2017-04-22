@@ -577,6 +577,25 @@ function schoolMapIt(sid, qobj) {
     }
 }
 
+
+function schoolList(param,qobj){
+	$(qobj).empty();
+	$.ajax({
+		url: '/school/list',
+		type: 'get',
+		dataType: 'json',
+		data: {user: _user},
+		success: function(result){
+			var div=null;
+			if(result.error != 'OK'){
+            	div = Frame.Tools.createNode("div", "padding-2 info", "没有数据");
+            	$(qobj).append(div);
+			}
+		}
+	});
+}
+
+/*
 function schoolList(param, qobj) {
 
     $(qobj).empty();
@@ -654,7 +673,7 @@ function schoolList(param, qobj) {
             $(div).append(',').append(export_div);
         }
     });
-}
+}*/
 
 function schoolEdit(sid, qobj) {
 
@@ -770,6 +789,7 @@ function schoolForm(qobj, edit_result) {
                 	si.validOk(name_div);
             	}
 
+				alert(lng);
             	if (!lng || !lat || (!edit_result && (!prov || !city || !dist || !street))) {
                 	si.validFailed("地址必须指定省市区街道");
             	}
@@ -785,6 +805,7 @@ function schoolForm(qobj, edit_result) {
 					dataType: 'json',
 					data: {name:sname,lid:level_val,lng:lng,lat:lat,prov:prov,city:city,dist:dist,street:street,sid:(edit_result? edit_result.sid:null),group:true},
 					success: function(r){
+						console.log(r);
                 		if (r == undefined || r.error != "OK") {
                     		si.failed();
                 		} else {
@@ -792,7 +813,7 @@ function schoolForm(qobj, edit_result) {
                     		if (!edit_result) {
                         		$(name_div).find("input").val("");
                         		Frame.menuAddItem('glyphicon glyphicon-unchecked', sname, 'menu_school', r.value);
-                    	}
+                    		}
                 		}
 					}
 				});
@@ -1536,6 +1557,25 @@ function classAdd(sid, qobj) {
             return;
         }
 
+		//增加班级
+		$.ajax({
+			url: '/classroom/add',
+			type: 'POST',
+ 			contentType:"application/x-www-form-urlencoded",
+			dataType: 'json',
+			data: {sid:sid, classes:classes},
+			success: function(r){
+				if(r.error == 'OK'){
+					Frame.Tools.activeButton(button,false);
+					$(input).val('');
+                	si.ok('已经增加了' + r.value + '个班级');
+				}else{
+                	si.failed(r.value);
+				}
+			}
+		});
+
+		/*
         $.post('jsonApi.php', {
             api: 'classAdd',
             sid: sid,
@@ -1548,7 +1588,7 @@ function classAdd(sid, qobj) {
             } else {
                 si.failed(r.value);
             }
-        });
+        });*/
     });
 
     $(input).keyup(onRzt);

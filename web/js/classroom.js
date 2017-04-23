@@ -733,6 +733,7 @@ function schoolList(param, qobj) {
     });
 }*/
 
+//编辑学校
 function schoolEdit(sid, qobj) {
 
     if ($(qobj).html() == "") {
@@ -740,6 +741,21 @@ function schoolEdit(sid, qobj) {
         var div = Frame.Tools.createNode("div");
         $(qobj).append(div);
 
+		$.ajax({
+			url: '/school/edit',
+			type: 'POST',
+			dataType: 'json',
+			data: {sid: sid},
+			success: function(result){
+				if(result.error == 'OK'){
+					console.log(result.value);
+
+                	schoolForm(div, result.value);
+				}
+			}
+		});
+
+		/*
         $.getJSON("jsonApi.php", {
             api: "schoolIt",
             sid: sid
@@ -748,7 +764,7 @@ function schoolEdit(sid, qobj) {
             if (result.error == "OK") {
                 schoolForm(div, result.value);
             }
-        });
+        });*/
     }
 }
 

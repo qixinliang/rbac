@@ -29,13 +29,29 @@ class SchoolController extends Controller{
 	public function actionAdd(){
 		$sModel = new School();
 		$request = Yii::$app->request;				
-		var_dump($request);
 		if($request->isPost){
 			if($sModel->load($request->post()) && $this->sModel->save()){
 				return json_encode(array());
 			}
 		}
 		return json_encode(array());
+	}
+	
+	public function actionEdit(){
+		$request = Yii::$app->request;	
+		if($request->isAjax){
+			$sid = $request->post('sid',1);
+			$sModel = \app\models\School::find()->where(['sid' => $sid])->asArray()->one(); 
+			var_dump($sModel);
+			return json_encode([
+				'error' => 'OK',
+				'value' => $sModel,
+			]);
+		}
+		return json_encode([
+			'error' => 'ERROR',
+			'value' => '',
+		]);
 	}
 
 	//具体学校的map接口

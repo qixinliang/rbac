@@ -587,9 +587,67 @@ function schoolList(param,qobj){
 		data: {user: _user},
 		success: function(result){
 			var div=null;
-			if(result.error != 'OK'){
+			if(result.code != '200'){
             	div = Frame.Tools.createNode("div", "padding-2 info", "没有数据");
             	$(qobj).append(div);
+			}else{
+            	div = Frame.Tools.createNode("div", "margin-2 padding-2");
+            	$(qobj).append(div);
+
+            	var div2 = Frame.Tools.createNode("div", "menu-list-view scroll-vertical");
+            	$(div).append(div2);
+
+            	var tab = Frame.Tools.createNode("table", "table my-table-no-borader");
+            	$(div2).append(tab);
+
+            	var th = Frame.Tools.createNode("thead");
+            	$(tab).append(th);
+
+            	var row = Frame.Tools.createTableRow(null, ["", "名称", "类型", "地址", "教室"]);
+            	$(th).append(row);
+
+            	var ars=result.data;
+            	var n=0;
+            	for (var i = 0; i < ars.length; i++) {
+                	var del = null;
+                	if (Number(ars[i].classes) == 0) {
+                    	if (_user == 'admin' && false) {
+                        	//TODO:check it later
+                        	del = $("<span class=\"glyphicon glyphicon-remove my-remove\"></span>");
+                        	$(del).prop("data", ars[i].sid);
+
+                        	$(del).click(function () {
+                            	var sid = $(this).prop("data");
+                            	var tr = $(this).parentsUntil("tr").parent();
+                            	$.getJSON("jsonApi.php", {
+                                	api: "removeSchool",
+                                	sid: sid
+                            	}, function (r) {
+                                	if (r.error == "OK") {
+                                    //menuRemoveSchool(sid);
+                                    //$(tr).remove();
+                                	}
+                            	});
+                        	});
+                    	} else {
+                        	del = $("<span>0</span>");
+                    	}
+                	} else {
+                    	del = ars[i].classes;
+                    	n+=parseInt(del);
+                	}
+
+                	row = Frame.Tools.createTableRow(null, [i + 1, ars[i].name,
+                    	ars[i].level, ars[i].address, del]);
+                	$(row).attr("sid", ars[i].sid);
+                	$(tab).append(row);
+            	}
+            	$(div).append('<br/><div>班级总数:'+(n?n:0)+
+                	'，一体机数：'+(result.value2?result.value2:0)+'</div>');
+
+            	var export_div=$('<a href="jsonApi.php?api=exportSchoolList&user='+_user+'">下载数据</a>');
+            	$(div).append(',').append(export_div);
+
 			}
 		}
 	});

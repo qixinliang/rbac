@@ -6,12 +6,12 @@ use app\models\Media;
 
 class MediaController extends Controller{
 	//根据媒体类型获取对应下的所有媒体
-	public function actionMedialist(){
+	public function actionList(){
 		$mModel = new Media(); 
 		$request = Yii::$app->request;
 		if($request->isAjax){
-			$type = $request->post('type',1);
-			$user = $request->post('user','admin');
+			$type = $request->get('type',1);
+			$user = $request->get('user','admin');
 			$ret = $mModel->getMedia($type,$user);
 			if(isset($ret) && !empty($ret)){
 				return json_encode([

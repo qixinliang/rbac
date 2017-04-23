@@ -1,11 +1,12 @@
 <?php
 namespace app\controllers;
 use yii\web\Controller;
-
+use Yii;
 use app\models\Mediatype;
 
 //媒资类型控制器
 class MediatypeController extends Controller{
+	public $enableCsrfValidation = false;
 	//获取所有媒体类型
 	public function actionList(){
 		$mtModel = new Mediatype();

@@ -194,94 +194,95 @@ function mediaListPage(qobj, page) {
 
     var fms_div = $(qobj).prop('fms-view');
 
-    $.getJSON("jsonApi.php", {
-        api: "mediaList",
-        type: mtid,
-        user: _user,
-        page: -1//page - 1
-    }, function (result) {
-        if (result.error != "OK") {
+    $.ajax({
+		url: '/media/list',
+		type: 'GET',
+		dataType: 'json',
+		data: {type:mtid, user:_user,page: -1},
+    	success: function (result) {
+        	if (result.error != "OK") {
 
-            var div = Frame.Tools.createNode("div", "padding-tab info", "没有数据");
-            $(qobj).append(div);
-            return;
-        }
+            	var div = Frame.Tools.createNode("div", "padding-tab info", "没有数据");
+            	$(qobj).append(div);
+            	return;
+        	}
 
-        var div = Frame.Tools.createNode("div",'title-area-view2 scroll-vertical');
-        $(qobj).append('<br/>').append(div).append('<br/>');
+        	var div = Frame.Tools.createNode("div",'title-area-view2 scroll-vertical');
+        	$(qobj).append('<br/>').append(div).append('<br/>');
 
-        var tab = Frame.Tools.createNode("table", "table table-condensed");
-        $(div).append(tab);
+        	var tab = Frame.Tools.createNode("table", "table table-condensed");
+        	$(div).append(tab);
 
-        var s = ["名称", "次数", "最后播放时间"];
-        if (acCheckAcl('media')) {
-            s.push('删除');
-        }
-        s.push(' ');
+        	var s = ["名称", "次数", "最后播放时间"];
+        	if (acCheckAcl('media')) {
+            	s.push('删除');
+        	}
+        	s.push(' ');
 
-        var row = Frame.Tools.createTableRow(null, s);
-        var thead = Frame.Tools.createNode('thead');
-        $(thead).append(row).appendTo(tab);
+        	var row = Frame.Tools.createTableRow(null, s);
+        	var thead = Frame.Tools.createNode('thead');
+        	$(thead).append(row).appendTo(tab);
 
-        var tbody = Frame.Tools.createNode('tbody');
-        $(tab).append(tbody);
+        	var tbody = Frame.Tools.createNode('tbody');
+        	$(tab).append(tbody);
 
-        $(result.value).each(function (i, it) {
+        	$(result.value).each(function (i, it) {
 
-            var s2 = [it.name, it.played, it.last_play ? it.last_play : " "];
-            if (acCheckAcl('media')) {
-                if (it.user == _user) {
-                    var del = $("<span class=\"glyphicon glyphicon-remove my-remove\"></span>");
-                    $(del).prop("data", it.mid);
-                    s2.push(del);
-                } else {
-                    s2.push(' ');
-                }
-            }
+            	var s2 = [it.name, it.played, it.last_play ? it.last_play : " "];
+            	if (acCheckAcl('media')) {
+                	if (it.user == _user) {
+                    	var del = $("<span class=\"glyphicon glyphicon-remove my-remove\"></span>");
+                    	$(del).prop("data", it.mid);
+                    	s2.push(del);
+                	} else {
+                    	s2.push(' ');
+                	}
+            	}
 
-            var nc = $('<a href="#"><span class="glyphicon glyphicon-play"></span></a>');
-            $(nc).prop('url', it.url);
-            $(nc).attr('title', it.url);
+            	var nc = $('<a href="#"><span class="glyphicon glyphicon-play"></span></a>');
+            	$(nc).prop('url', it.url);
+            	$(nc).attr('title', it.url);
 
-            $(nc).click(function () {
-                var url = $(this).prop('url');
-                fmsViewChanged(fms_div, url, $(nc).text());
-            });
-            s2.push(nc);
+            	$(nc).click(function () {
+                	var url = $(this).prop('url');
+                	fmsViewChanged(fms_div, url, $(nc).text());
+            	});
+            	s2.push(nc);
 
-            var row = Frame.Tools.createTableRow(null, s2);
-            $(tbody).append(row);
-        });
+            	var row = Frame.Tools.createTableRow(null, s2);
+            	$(tbody).append(row);
+        	});
 
-        $(tab).find('span.my-remove').click(function () {
-            var mid = $(this).prop("data");
-            var tr = $(this).parentsUntil("tr").parent();
-            var span = this;
+        	$(tab).find('span.my-remove').click(function () {
+            	var mid = $(this).prop("data");
+            	var tr = $(this).parentsUntil("tr").parent();
+            	var span = this;
 
-            $.getJSON("jsonApi.php", {
-                api: "mediaDelete",
-                mid: mid
-            }, function (r) {
-                if (r.error == "OK") {
-                    if (r.value == 'deleted') {
-                        $(tr).addClass('my-deleted');
-                        $(span).removeClass('glyphicon-remove').addClass('glyphicon-repeat');
-                    } else {
-                        $(tr).removeClass('my-deleted');
-                        $(span).removeClass('glyphicon-repeat').addClass('glyphicon-remove');
-                    }
-                }
-            });
-        });
+            	$.getJSON("jsonApi.php", {
+                	api: "mediaDelete",
+                	mid: mid
+            	}, function (r) {
+                	if (r.error == "OK") {
+                    	if (r.value == 'deleted') {
+                        	$(tr).addClass('my-deleted');
+                        	$(span).removeClass('glyphicon-remove').addClass('glyphicon-repeat');
+                    	} else {
+                        	$(tr).removeClass('my-deleted');
+                        	$(span).removeClass('glyphicon-repeat').addClass('glyphicon-remove');
+                    	}
+                	}
+            	});
+        	});
 
-        /*
-        var pageind = result.value2;
-        pageind.fun = mediaListPage;
-        pageind.param = qobj;
+        	/*
+        	var pageind = result.value2;
+        	pageind.fun = mediaListPage;
+        	pageind.param = qobj;
 
-        $(div).append(Frame.Tools.createPageInd(pageind)).append('<br/>');
-        */
-    });
+        	$(div).append(Frame.Tools.createPageInd(pageind)).append('<br/>');
+        	*/
+    	}
+	});
 }
 
 function mediaTypeEdit(mtid, qobj) {
@@ -528,8 +529,9 @@ function mediaType(qobj, edit) {
 		}
 
 		$.ajax({
-			url : url,
-			type: 'post',
+			url: url,
+			type: 'POST',
+ 			//contentType:"application/x-www-form-urlencoded",
 			dataType: 'json',
 			data: data,
 			success: function(r){
